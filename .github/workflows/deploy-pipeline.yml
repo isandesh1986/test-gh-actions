@@ -1,0 +1,62 @@
+name: deploypipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployCluster:
+        description: 'Deploy Cluster Name.'
+        required: true
+        type: string  
+        default: 'EKS'
+      secretsName:
+        description: 'Secrets Name.'
+        type: string
+        default: 'acr1'
+        
+permissions:
+  actions: write
+env:
+  deploymentYamlPath: "./k8s_deployments/application-deployment.yaml" 
+  ingressYamlPath: "./k8s_deployments/ingress.yaml"  
+  deployFilesPath: "./k8s_deployments"
+  k8sNamespace: "hangar"
+
+jobs:
+  Deploy_to_EKS:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.deployCluster == 'EKS' }}
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2 
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Set EKS Environment Variables
+        uses: tw3lveparsecs/github-actions-setvars@v0.1
+        with:
+          envFilePath: "./.github/vars/eks_variables.env"
+                             
+      - name: Deploy app to EKS 
+        env:
+          imagename: "$imagename"
+        run: .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
+        shell: bash
+        
+      - name: Create secrets for EKS
+        if: ${{ github.event.inputs.deployCluster == 'EKS' && github.event.inputs.secretsName != '' }}
+        env:
+          secretsName: "acr1"
+        run: .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ env.aws_access_key }}" "${{ env.aws_secret_access_key }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}"
+        shell: bash
+
+
+
+       
+          
+  
+      
