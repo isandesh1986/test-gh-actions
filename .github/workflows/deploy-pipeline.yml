@@ -41,30 +41,13 @@ jobs:
         with:
           envFilePath: "./.github/vars/*"
                              
-      - name: Deploy app to EKS 
-        env:
-          imagename: "ultimatom/package_image_test:latest" 
-        run: |
-          aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
-          .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
-        shell: bash
-
       - name: list pods
         run: |
           kubectl get nodes
           kubectl get ns
-          kubectl get all -n hangar
+          kubectl get all -n hangarthree
           
-      - name: Create secrets for EKS
-        if: ${{ github.event.inputs.deployCluster == 'EKS' && github.event.inputs.secretsName != '' }}
-        env:
-          secretsName: "acr1"
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
-          .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ env.aws-access-key-id }}" "${{ env.aws-secret-access-key }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}"
-        shell: bash  
+      
         
      
 
