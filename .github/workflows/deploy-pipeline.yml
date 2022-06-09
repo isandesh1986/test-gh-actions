@@ -47,7 +47,6 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           ls -lrt
-          shell: bash
         
       - name: Create secrets for EKS
         if: ${{ github.event.inputs.deployCluster == 'EKS' && github.event.inputs.secretsName != '' }}
