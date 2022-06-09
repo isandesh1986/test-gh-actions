@@ -50,6 +50,12 @@ jobs:
           .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
         shell: bash
         
+      - name: list pods
+        run: |
+          kubectl get nodes
+          kubectl get ns
+          kubectl get all -n hangar
+          
       - name: Create secrets for EKS
         if: ${{ github.event.inputs.deployCluster == 'EKS' && github.event.inputs.secretsName != '' }}
         env:
