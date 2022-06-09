@@ -45,7 +45,7 @@ jobs:
         env:
           imagename: "$imagename"
         run: |
-          cat "${{ env.deploymentYamlPath }}"
+          echo deploymentYamlPath = "${{ env.deploymentYamlPath }}"
           .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
         shell: bash
         
