@@ -46,8 +46,6 @@ jobs:
           imagename: "ultimatom/package_image_test:latest" 
         run: |
           aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
-          kubectl get ns
-          kubectl delete ns -n hangar
           .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
         shell: bash
 
