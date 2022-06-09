@@ -43,6 +43,7 @@ jobs:
                              
       - name: list pods
         run: |
+          aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
           kubectl get nodes
           kubectl get ns
           kubectl get all -n hangarthree
