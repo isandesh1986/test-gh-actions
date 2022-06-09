@@ -30,9 +30,10 @@ jobs:
         uses: actions/checkout@v2 
 
       - name: Configure AWS Credentials
+        id: credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
       
@@ -62,7 +63,8 @@ jobs:
           secretsName: "acr1"
         run: |
           aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
-          .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ secrets.AWS_ACCESS_KEY_ID }}" "${{ secrets.AWS_SECRET_ACCESS_KEY }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}"
+          echo "values: ${{ steps.credentials.outputs.aws-access-key-id }}"
+          .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ steps.credentials.outputs.aws-access-key-id }}" "${{ steps.credentials.outputs.aws-secret-access-key }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}"
         shell: bash  
         
      
