@@ -16,9 +16,9 @@ on:
 permissions:
   actions: write
 env:
-  deploymentYamlPath: "${{ github.workspace }}/k8s/application-deployment.yaml" 
-  ingressYamlPath: "${{ github.workspace }}/k8s/ingress.yaml"  
-  deployFilesPath: "${{ github.workspace }}/k8s"
+  deploymentYamlPath: " ./k8s/application-deployment.yaml" 
+  ingressYamlPath: "./k8s/ingress.yaml"  
+  deployFilesPath: "./k8s"
   k8sNamespace: "hangar"
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
           imagename: "ultimatom/package_image_test:latest" 
         run: |
           aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
-          kubectl cluster-info
+          kubectl get nodes
           .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
         shell: bash
         
