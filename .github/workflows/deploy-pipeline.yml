@@ -46,26 +46,12 @@ jobs:
           imagename: "ultimatom/package_image_test:latest" 
         run: |
           aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
+          kubectl get ns
           kubectl delete ns -n hangar
           .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
         shell: bash
         
-      - name: list pods
-        run: |
-          kubectl get nodes
-          kubectl get ns
-          kubectl get all -n hangar
-          
-      - name: Create secrets for EKS
-        if: ${{ github.event.inputs.deployCluster == 'EKS' && github.event.inputs.secretsName != '' }}
-        env:
-          secretsName: "acr1"
-        run: |
-          aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
-          .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ env.aws_access_key }}" "${{ env.aws_secret_access_key }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}"
-        shell: bash
-
-
+     
 
        
           
