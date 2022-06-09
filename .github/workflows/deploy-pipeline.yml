@@ -52,7 +52,7 @@ jobs:
           aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
           echo "values: ${{ steps.credentials.outputs.aws-access-key-id }}"
           echo "${{ env.aws-access-key-id }}"
-          .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ steps.credentials.outputs.aws-access-key-id }}" "${{ steps.credentials.outputs.aws-secret-access-key }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}"
+          .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ env.aws-access-key-id }}" "${{ env.aws-secret-access-key }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}"
         shell: bash  
         
      
