@@ -45,11 +45,7 @@ jobs:
         env:
           imagename: "$imagename"
         run: |
-          cd ${{ github.workspace }}
-          ls -lrt
           .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
-           cd ${{ github.repository }}
-           ls -lrt
         shell: bash
        
       - name: Create secrets for EKS
