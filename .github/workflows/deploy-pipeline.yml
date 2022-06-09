@@ -44,9 +44,7 @@ jobs:
       - name: Deploy app to EKS 
         env:
           imagename: "$imagename"
-        run: |
-          echo deploymentYamlPath = "${{ env.deploymentYamlPath }}"
-          .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
+        run: .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
         shell: bash
         
       - name: Create secrets for EKS
