@@ -62,7 +62,7 @@ jobs:
           secretsName: "acr1"
         run: |
           aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
-          .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ env.aws_access_key }}" "${{ env.aws_secret_access_key }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}"
+          .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ secrets.AWS_ACCESS_KEY_ID }}" "${{ secrets.AWS_SECRET_ACCESS_KEY }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}"
         shell: bash  
         
      
