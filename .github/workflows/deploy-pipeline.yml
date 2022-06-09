@@ -17,8 +17,8 @@ permissions:
   actions: write
 env:
   deploymentYamlPath: "${{ github.workspace }}/k8s/application-deployment.yaml" 
-  ingressYamlPath: "./k8s/ingress.yaml"  
-  deployFilesPath: "./k8s"
+  ingressYamlPath: "${{ github.workspace }}/k8s/ingress.yaml"  
+  deployFilesPath: "${{ github.workspace }}/k8s"
   k8sNamespace: "hangar"
 
 jobs:
