@@ -42,12 +42,6 @@ jobs:
         with:
           envFilePath: "./.github/vars/*"
                              
-      - name: list pods
-        run: |
-          kubectl get nodes
-          kubectl get ns
-          kubectl get all -n hangar
-          
       - name: Create secrets for EKS
         if: ${{ github.event.inputs.deployCluster == 'EKS' && github.event.inputs.secretsName != '' }}
         env:
