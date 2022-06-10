@@ -19,7 +19,7 @@ env:
   deploymentYamlPath: "${{ github.workspace }}/k8s/application-deployment.yaml" 
   ingressYamlPath: "${{ github.workspace }}/k8s/ingress.yaml"  
   deployFilesPath: "${{ github.workspace }}/k8s"
-  k8sNamespace: "hangar4"
+  k8sNamespace: "hangar5"
 
 jobs:
   Deploy_to_EKS:
@@ -44,9 +44,8 @@ jobs:
       - name: list pods
         run: |
           aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
-          kubectl get nodes
           kubectl get ns
-          kubectl get all -n hangar4
+          kubectl get all -n hangar5
           
      
         
