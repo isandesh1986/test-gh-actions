@@ -40,12 +40,19 @@ jobs:
         uses: tw3lveparsecs/github-actions-setvars@v0.1
         with:
           envFilePath: "./.github/vars/*"
-                             
+      - name: create nginx controller second service
+        run: |
+        aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
+        kubectl apply -f ${{ github.workspace }}/second_ingress.yaml -n nginx-ingress
+        sleep 30s
+        kubectl get svc -n nginx-ingress
+      
       - name: list pods
         run: |
           aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
+          sleep 30s
           kubectl get ns
-          kubectl get all -n hangar5
+          kubectl get svc -n nginx-ingress
           
      
         
