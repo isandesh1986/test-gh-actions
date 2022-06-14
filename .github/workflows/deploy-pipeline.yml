@@ -1,0 +1,115 @@
+name: deploy-pipeline-test-changes
+
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      deployCluster:
+        description: 'Deploy Cluster Name.'
+        required: true
+        type: string  
+        default: 'EKS'
+      secretsName:
+        description: 'Secrets Name.'
+        type: string
+        default: 'acr1'
+        
+permissions:
+  actions: write
+env:
+  deploymentYamlPath: "${{ github.workspace }}/k8s_deployments/application-deployment.yaml" 
+  ingressYamlPath: "${{ github.workspace }}/k8s_deployments/ingress.yaml"  
+  deployFilesPath: "${{ github.workspace }}/k8s_deployments"
+  k8sNamespace: "hangar00"
+
+jobs:
+  Deploy_to_AKS:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.deployCluster == 'AKS' }}
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2 
+
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          # Artifact name
+          name: # optional
+          # Destination path
+          path: ./
+
+      - name: Download kubeconfig
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: ${{ env.ProvisionPipelineYamlName }}
+          commit: ${{ github.sha }}
+          check_artifacts:  true
+
+      - name: Deploy app to AKS 
+        env:
+          kubeconfigPath: "$kubeconfigPath"
+          imagename: "$imagename"
+        run: |
+          .github/workflows/scripts/eks-deploy.sh "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}" "${{ env.k8sNamespace }}" "${{ env.kubeconfigPath }}"  
+        shell: bash 
+        
+      - name: Create secrets for AKS
+        if: ${{ github.event.inputs.deployCluster == 'AKS' && github.event.inputs.secretsName != '' }}
+        env:
+          secretsName: "acr1"
+        run: |
+          .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ env.docker_username }}" "${{ env.docker_password }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}" "${{ env.kubeconfigPath }}"
+        shell: bash 
+
+  Deploy_to_EKS:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.deployCluster == 'EKS' }} 
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2 
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+      
+      - name: Set EKS Environment Variables
+        uses: tw3lveparsecs/github-actions-setvars@v0.1
+        with:
+          envFilePath: "./.github/vars/*"
+                             
+      - name: Deploy app to EKS 
+        env:
+          imagename: "ultimatom/package_image_test:latest" 
+        run: |
+          aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
+          .github/workflows/scripts/eks-deploy.sh "${{ env.k8sNamespace }}" "${{ env.imagename }}" "${{ env.dns_name }}" "${{ env.deploymentYamlPath }}" "${{ env.ingressYamlPath }}" "${{ env.deployFilesPath }}"  
+        shell: bash
+
+      - name: list pods
+        run: |
+          sleep 30s
+          kubectl get nodes
+          kubectl get ns
+          kubectl get all -n "${{ env.k8sNamespace }}"
+          kubectl get svc -n nginx-ingress
+          
+      - name: Create secrets for EKS
+        if: ${{ github.event.inputs.deployCluster == 'EKS' && github.event.inputs.secretsName != '' }}
+        env:
+          secretsName: "acr1"
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws eks update-kubeconfig --name ${{ env.cluster_name }} --region 'eu-west-1'
+          .github/workflows/scripts/ecr-secrets.sh "${{ env.k8sNamespace }}" "${{ env. secretsName }}" "${{ env.aws-access-key-id }}" "${{ env.aws-secret-access-key }}" "${{ env.registry }}" "${{ env.deploymentYamlPath }}"
+        shell: bash  
+        
+     
+
+       
+          
+  
+      
