@@ -17,10 +17,10 @@ on:
 permissions:
   actions: write
 env:
-  deploymentYamlPath: "${{ github.workspace }}/k8s_deployments/application-deployment.yaml" 
-  ingressYamlPath: "${{ github.workspace }}/k8s_deployments/ingress.yaml"  
-  deployFilesPath: "${{ github.workspace }}/k8s_deployments"
-  k8sNamespace: "hangar00"
+  deploymentYamlPath: "${{ github.workspace }}/k8s/application-deployment.yaml" 
+  ingressYamlPath: "${{ github.workspace }}/k8s/ingress.yaml"  
+  deployFilesPath: "${{ github.workspace }}/k8s"
+  k8sNamespace: "hangar001"
 
 jobs:
   Deploy_to_AKS:
